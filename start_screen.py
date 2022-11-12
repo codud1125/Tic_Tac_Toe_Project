@@ -4,7 +4,7 @@ from PIL import ImageTk, Image
 
 class startScreen:
 
-    def __init__(self, root, canvas):
+    def __init__(self, root, canvas, player1_score, player2_score):
 
         for child in canvas.winfo_children():
             child.destroy()
@@ -34,7 +34,7 @@ class startScreen:
         for row in range(0, 3):
             for col in range (0, 3):
                 cell = Button(canvas, image = self.block_image, borderwidth = 1, highlightthickness=0)
-                cell.configure(command = lambda cellinput = cell, rowinput = row, colinput = col: self.click_block(root, canvas, cellinput, rowinput, colinput))
+                cell.configure(command = lambda cellinput = cell, rowinput = row, colinput = col: self.click_block(root, canvas, cellinput, rowinput, colinput, player1_score, player2_score))
                 cell.image = self.block_image
                 cell.grid(row=row, column=col, rowspan=1, columnspan=1, sticky=N+S+E+W)
 
@@ -44,8 +44,11 @@ class startScreen:
         self.label_player2 = Label(canvas, text='Player 2', font = 'Helvetica 14')
         self.label_player2.grid(row=3, column=2)
 
+        self.label_score = Label(canvas, text=f'{player1_score}:{player2_score}', font = 'Helvetica 14')
+        self.label_score.grid(row=3, column=1)
 
-    def click_block(self, root, canvas, cell, row, col):
+
+    def click_block(self, root, canvas, cell, row, col, player1_score, player2_score):
 
         self.click_attempt += 1
         
@@ -70,9 +73,10 @@ class startScreen:
                 self.winning_label = Label(canvas, text='Player 1 wins!', font = 'Helvetica 14', fg='red')
                 self.winning_label.grid(row=0, column=0)
 
-                self.restart_btn = Button(canvas, text='Restart the game', font = ('Helvetica', 10), borderwidth = 0, highlightthickness=0, command=lambda: self.restart(root, canvas))
+                self.restart_btn = Button(canvas, text='Restart the game', font = ('Helvetica', 10), borderwidth = 0, highlightthickness=0, command=lambda: self.restart(root, canvas, player1_score, player2_score))
                 self.restart_btn.grid(row=1, column=0)
 
+                player1_score += 1
 
             if (all(x in self.player2_list for x in winning_entry)):
                 for child in canvas.winfo_children():
@@ -81,12 +85,24 @@ class startScreen:
                 self.winning_label = Label(canvas, text='Player 2 wins!', font = 'Helvetica 14', fg='red')
                 self.winning_label.grid(row=0, column=0)
 
-                self.restart_btn = Button(canvas, text='Restart the game', font = ('Helvetica', 10), borderwidth = 0, highlightthickness=0, command=lambda: self.restart(root, canvas))
+                self.restart_btn = Button(canvas, text='Restart the game', font = ('Helvetica', 10), borderwidth = 0, highlightthickness=0, command=lambda: self.restart(root, canvas, player1_score, player2_score))
                 self.restart_btn.grid(row=1, column=0)
 
+                player2_score += 1
+            
+        if self.click_attempt == 9:
+            for child in canvas.winfo_children():
+                child.destroy()
 
-    def restart(self, root, canvas):
-        restartScreen = startScreen(root, canvas)
+            self.winning_label = Label(canvas, text='Tie!', font = 'Helvetica 14', fg='red')
+            self.winning_label.grid(row=0, column=0)
+
+            self.restart_btn = Button(canvas, text='Restart the game', font = ('Helvetica', 10), borderwidth = 0, highlightthickness=0, command=lambda: self.restart(root, canvas, player1_score, player2_score))
+            self.restart_btn.grid(row=1, column=0)
+
+
+    def restart(self, root, canvas, player1_score, player2_score):
+        restartScreen = startScreen(root, canvas, player1_score, player2_score)
 
 
 
